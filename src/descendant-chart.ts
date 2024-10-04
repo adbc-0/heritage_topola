@@ -104,6 +104,11 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
     return nodes;
   }
 
+  private areParents(indiId: string) {
+    const indi = this.options.data.getIndi(indiId)!;
+    return Boolean(indi.getFamilyAsChild());
+  }
+
   private getFamNode(famId: string): TreeNode {
     const node: TreeNode = { id: famId, family: { id: famId } };
     const fam = this.options.data.getFam(famId)!;
@@ -121,6 +126,8 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
   /** Creates a d3 hierarchy from the input data. */
   createHierarchy(): HierarchyNode<TreeNode> {
     const parents: TreeNode[] = [];
+    // if exists then don't render node and render connection instead
+    const spousesFromTree: string[] = [];
 
     const nodes = this.options.startIndi
       ? this.getNodes(this.options.startIndi)
@@ -142,14 +149,17 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
       nodes.forEach((node) => (node.parentId = dummyNode.id));
     }
 
+    // only data for initial person is generated
     parents.push(...nodes);
-
     const stack: TreeNode[] = [];
     nodes.forEach((node) => {
       if (node.family) {
         stack.push(node);
       }
     });
+
+    console.log("all_family_data::", this.options.data);
+
     while (stack.length) {
       const entry = stack.pop()!;
       const fam = this.options.data.getFam(entry.family!.id)!;
@@ -160,19 +170,35 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
           ? ExpanderState.PLUS
           : ExpanderState.MINUS;
       }
-      if (!collapsed) {
-        children.forEach((childId) => {
-          const childNodes = this.getNodes(childId);
-          childNodes.forEach((node) => {
-            node.parentId = entry.id;
-            if (node.family) {
-              node.id = `${idGenerator.getId(node.family.id)}`;
-              stack.push(node);
-            }
-          });
-          parents.push(...childNodes);
-        });
+      if (collapsed) {
+        continue;
       }
+      children.forEach((childId) => {
+        const childNodes = this
+          .getNodes(childId)
+          .filter((c) => !spousesFromTree.includes(c.indi?.id!));
+        const spouseIds = childNodes
+          .map((childFamilies) => childFamilies.spouse?.id)
+          .filter((spouseId) => spouseId);
+        const spousesThatExistOnTree = spouseIds
+          .filter((spouseId) => this.areParents(spouseId!))
+        spousesThatExistOnTree.forEach((spouseId) => {
+          spousesFromTree.push(spouseId!);
+        });
+
+        // go through each child
+        childNodes.forEach((node) => {
+          node.parentId = entry.id;
+          const childHasHisOwnFamily = Boolean(node.family);
+          if (childHasHisOwnFamily) {
+            node.id = `${idGenerator.getId(node.family!.id)}`;
+            // if child has own family then recurse
+            stack.push(node);
+          }
+        });
+        // render child
+        parents.push(...childNodes);
+      });
     }
     return stratify<TreeNode>()(parents);
   }

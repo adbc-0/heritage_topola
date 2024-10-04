@@ -133,6 +133,21 @@ export class ChartUtil {
               ${dx} ${dy}`;
   }
 
+  private linkVerticalSpouse(
+    s: HierarchyPointNode<TreeNode>,
+    d: HierarchyPointNode<TreeNode>
+  ) {
+    const sAnchor = this.options.renderer.getFamilyAnchor(s.data);
+    const dAnchor = this.options.renderer.getSpouseAnchor(d.data);
+    const [sx, sy] = [s.x + sAnchor[0], s.y + sAnchor[1]];
+    const [dx, dy] = [d.x + dAnchor[0], d.y + dAnchor[1]];
+    const midY = s.y + s.data.height! / 2 + V_SPACING / 2;
+    return `M ${sx} ${sy}
+            L ${sx} ${midY},
+              ${dx} ${midY},
+              ${dx} ${dy}`;
+  }
+
   private linkAdditionalMarriage(node: HierarchyPointNode<TreeNode>) {
     const nodeIndex = node.parent!.children!.findIndex(
       (n) => n.data.id === node.data.id
@@ -336,74 +351,55 @@ export class ChartUtil {
           return this.linkAdditionalMarriage(child);
         }
         const flipVertically = parent.data.generation! > child.data.generation!;
-        if (this.options.horizontal) {
-          if (flipVertically) {
-            return this.linkHorizontal(child, parent);
-          }
-          return this.linkHorizontal(parent, child);
-        }
         if (flipVertically) {
           return this.linkVertical(child, parent);
         }
         return this.linkVertical(parent, child);
       };
 
+      const linkSpouse = (
+        parent: HierarchyPointNode<TreeNode>,
+        child: HierarchyPointNode<TreeNode>
+      ) => {
+        if (child.data.additionalMarriage) {
+          return this.linkAdditionalMarriage(child);
+        }
+        const flipVertically = parent.data.generation! > child.data.generation!;
+        if (flipVertically) {
+          return this.linkVerticalSpouse(child, parent);
+        }
+        return this.linkVerticalSpouse(parent, child);
+      }
+
       const links = nodes.filter(
         (n) => !!n.parent || n.data.additionalMarriage
       );
-      const boundLinks = svg
+      
+      svg
         .select('g')
         .selectAll('path.link')
-        .data(links, linkId);
-      const path = boundLinks
+        .data(links, linkId)
         .enter()
         .insert('path', 'g')
         .attr('class', (node) =>
           node.data.additionalMarriage ? 'link additional-marriage' : 'link'
         )
-        .attr('d', (node) => link(node.parent!, node));
+        .attr('d', (node) => link(node.parent!, node))
 
-      let transitionsPending =
-        boundLinks.exit().size() + boundLinks.size() + path.size();
-      const transitionDone = () => {
-        transitionsPending--;
-        if (transitionsPending === 0) {
-          resolve();
-        }
-      };
-      if (!this.options.animate || transitionsPending === 0) {
-        resolve();
-      }
+      // const wypadekNode = nodes.find((n) => n.data.indi?.id === "I9")!;
+      // const ewa = nodes.find((n) => n.data.indi?.id === "I9")!;
+      // const janBasiaFamNode = nodes.find((n) => n.id === "F4")!;
 
-      const linkTransition = this.options.animate
-        ? boundLinks
-            .transition()
-            .delay(HIDE_TIME_MS)
-            .duration(MOVE_TIME_MS)
-            .on('end', transitionDone)
-        : boundLinks;
-      linkTransition.attr('d', (node) => link(node.parent!, node));
-
-      if (this.options.animate) {
-        path
-          .style('opacity', 0)
-          .transition()
-          .delay(2 * HIDE_TIME_MS + MOVE_TIME_MS)
-          .duration(0)
-          .style('opacity', 1)
-          .on('end', transitionDone);
-      }
-      if (this.options.animate) {
-        boundLinks
-          .exit()
-          .transition()
-          .duration(0)
-          .style('opacity', 0)
-          .remove()
-          .on('end', transitionDone);
-      } else {
-        boundLinks.exit().remove();
-      }
+      // svg
+      //   .select('g')
+      //   .selectAll('path.link')
+      //   .data([wypadekNode, ewa, janBasiaFamNode], linkId)
+      //   .enter()
+      //   .insert('path', 'g')
+      //   .attr('class', (node) =>
+      //     node.data.additionalMarriage ? 'link additional-marriage' : 'link'
+      //   )
+      //   .attr('d', () => linkSpouse(janBasiaFamNode, ewa));
     });
     return animationPromise;
   }

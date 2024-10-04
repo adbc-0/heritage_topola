@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
-    "target": "ES5",
-    "lib": ["ES6", "DOM", "ESNext.Array"],
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
     "outDir": "./dist",
     "declaration": true,
     "strictNullChecks": true
