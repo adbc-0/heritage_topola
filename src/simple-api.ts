@@ -1,7 +1,7 @@
-import { ChartColors } from '.';
 import { select } from 'd3-selection';
 import {
   Chart,
+  ChartColors,
   ChartInfo,
   ChartOptions,
   ExpanderDirection,

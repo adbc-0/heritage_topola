@@ -1,10 +1,10 @@
 import { BaseType, select, Selection } from 'd3-selection';
-import { ChartColors } from '.';
 import { FamDetails, IndiDetails } from './data';
 import { formatDateOrRange } from './date-format';
 import { max } from 'd3-array';
 import 'd3-transition';
 import {
+  ChartColors,
   Renderer,
   RendererOptions,
   TreeEntry,
