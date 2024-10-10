@@ -43,6 +43,7 @@ export class HourglassChart<IndiT extends Indi, FamT extends Fam>
 
     // slice(1) removes the duplicated start node.
     const nodes = ancestorNodes.slice(1).concat(descendantNodes);
+    // console.log("render_my_chart");
     const animationPromise = this.util.renderChart(nodes);
 
     const info = getChartInfo(nodes);

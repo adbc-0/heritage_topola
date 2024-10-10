@@ -289,9 +289,11 @@ export class ChartUtil {
         resolve();
       }
 
+      // console.log("rendered_nodes::", nodes);
+      // node classes
       nodeEnter
         .merge(boundNodes)
-        .attr('class', (node) => `node generation${node.data.generation}`);
+        .attr('class', (node) => `node generation${node.data.generation} ${(node.data as any).isInvisible ? 'invisible' : ''}`);
       nodeEnter.attr(
         'transform',
         (node: HierarchyPointNode<TreeNode>) =>
@@ -357,6 +359,7 @@ export class ChartUtil {
         return this.linkVertical(parent, child);
       };
 
+      // console.log("rendered_links::", nodes);
       const linkSpouse = (
         parent: HierarchyPointNode<TreeNode>,
         child: HierarchyPointNode<TreeNode>
@@ -381,10 +384,22 @@ export class ChartUtil {
         .data(links, linkId)
         .enter()
         .insert('path', 'g')
-        .attr('class', (node) =>
-          node.data.additionalMarriage ? 'link additional-marriage' : 'link'
-        )
-        .attr('d', (node) => link(node.parent!, node))
+        .attr('class', (node) => {
+          let classes = node.data.additionalMarriage ? 'link additional-marriage' : 'link';
+          // if ((node as any).data.isInvisible) {
+          //   classes += ' invisible';
+          // }
+          return classes;
+        })
+        .attr('d', (node) => {
+          if ((node.data as any).isInvisible) {
+            return '';
+          }
+          if ((node.parent!.data as any).isInvisible) {
+            return '';
+          }
+          return link(node.parent!, node)
+        })
 
       // const wypadekNode = nodes.find((n) => n.data.indi?.id === "I9")!;
       // const ewa = nodes.find((n) => n.data.indi?.id === "I9")!;

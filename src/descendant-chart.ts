@@ -48,6 +48,11 @@ function removeDummyNode(allNodes: Array<HierarchyPointNode<TreeNode>>) {
   return nodes;
 }
 
+function removeDummyNodes(allNodes: Array<HierarchyPointNode<TreeNode>>) {
+  // find all dummy nodes
+  // find next child
+}
+
 /** Returns the spouse of the given individual in the given family. */
 function getSpouse(indiId: string, fam: Fam): string | null {
   if (fam.getFather() === indiId) {
@@ -109,6 +114,14 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
     return Boolean(indi.getFamilyAsChild());
   }
 
+  getIndiDetails(indiId: string) {
+    const indi = (this.options.data as any).json.indis.find((indi: any) => indi.id === indiId);
+    if (!indi) {
+      throw new Error("No indi");
+    }
+    return indi;
+  }
+
   private getFamNode(famId: string): TreeNode {
     const node: TreeNode = { id: famId, family: { id: famId } };
     const fam = this.options.data.getFam(famId)!;
@@ -158,7 +171,7 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
       }
     });
 
-    console.log("all_family_data::", this.options.data);
+    // console.log("all_family_data::", this.options.data);
 
     while (stack.length) {
       const entry = stack.pop()!;
@@ -200,6 +213,37 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
         parents.push(...childNodes);
       });
     }
+
+    parents.forEach((parent: any) => {
+      this.getIndiDetails('I1');
+      if (parent.id === 'DUMMY_ROOT_NODE') {
+        return;
+      }
+      const familyId = parent.family?.id;
+      if (familyId) {
+        const family = this.options.data.getFam(familyId) as any;
+        const husbId = family?.json?.husb;
+        if (husbId) {
+          const indi = this.getIndiDetails(husbId);
+          if (indi.firstName === 'DUMMY' && indi.lastName === 'NODE') {
+            parent.isInvisible = true;
+          }
+        }
+        const wifeId = family?.json?.wife;
+        if (wifeId) {
+          const indi = this.getIndiDetails(wifeId);
+          if (indi.firstName === 'DUMMY' && indi.lastName === 'NODE') {
+            parent.isInvisible = true;
+          }
+        }
+        return;
+      }
+      const indiId = parent.id;
+      const indi = this.getIndiDetails(indiId);
+      if (indi.firstName === 'DUMMY' && indi.lastName === 'NODE') {
+        parent.isInvisible = true;
+      }
+    })
     return stratify<TreeNode>()(parents);
   }
 

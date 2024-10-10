@@ -94,6 +94,10 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
   stroke-width: 1px;
 }
 
+.invisible {
+  opacity: 0;
+}
+
 .additional-marriage {
   stroke-dasharray: 2;
 }`;
