@@ -63,8 +63,7 @@ function getSpouse(indiId: string, fam: Fam): string | null {
 
 /** Renders a descendants chart. */
 export class DescendantChart<IndiT extends Indi, FamT extends Fam>
-  implements Chart
-{
+  implements Chart {
   readonly util: ChartUtil;
 
   constructor(readonly options: ChartOptions) {
@@ -140,7 +139,7 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
   createHierarchy(): HierarchyNode<TreeNode> {
     const parents: TreeNode[] = [];
     // if exists then don't render node and render connection instead
-    const spousesFromTree: string[] = [];
+    const relatedPair: Record<'main' | 'spouse', string>[] = [];
 
     const nodes = this.options.startIndi
       ? this.getNodes(this.options.startIndi)
@@ -171,8 +170,6 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
       }
     });
 
-    // console.log("all_family_data::", this.options.data);
-
     while (stack.length) {
       const entry = stack.pop()!;
       const fam = this.options.data.getFam(entry.family!.id)!;
@@ -189,14 +186,15 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
       children.forEach((childId) => {
         const childNodes = this
           .getNodes(childId)
-          .filter((c) => !spousesFromTree.includes(c.indi?.id!));
-        const spouseIds = childNodes
-          .map((childFamilies) => childFamilies.spouse?.id)
-          .filter((spouseId) => spouseId);
-        const spousesThatExistOnTree = spouseIds
-          .filter((spouseId) => this.areParents(spouseId!))
-        spousesThatExistOnTree.forEach((spouseId) => {
-          spousesFromTree.push(spouseId!);
+          .filter((c) =>
+            !relatedPair.find(({ spouse }) => spouse === c.indi?.id)
+          );
+        const relatedSpousePair = childNodes
+          .map((child) => ({ main: child.indi?.id!, spouse: child.spouse?.id! }))
+          .filter(({ spouse }) => spouse)
+          .filter(({ spouse }) => this.areParents(spouse!));
+        relatedSpousePair.forEach((pair) => {
+          relatedPair.push(pair)
         });
 
         // go through each child
@@ -214,8 +212,8 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
       });
     }
 
+    // mark node as invisible
     parents.forEach((parent: any) => {
-      this.getIndiDetails('I1');
       if (parent.id === 'DUMMY_ROOT_NODE') {
         return;
       }
@@ -243,7 +241,20 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
       if (indi.firstName === 'DUMMY' && indi.lastName === 'NODE') {
         parent.isInvisible = true;
       }
-    })
+    });
+
+    // mark spouse in tree
+    parents.forEach((parent: any) => {
+      const parentId = parent.indi?.id;
+      const pair = relatedPair.find(({ main }) => main === parentId);
+      if (!pair) {
+        parent.relatedSpouse = undefined;
+        return;
+      }
+      const spouseParentsFamily = (this.options.data as any).indis.get(pair?.spouse).json.famc;
+      parent.relatedSpouse = { id: pair?.spouse, parentsFamilyId: spouseParentsFamily };
+    });
+
     return stratify<TreeNode>()(parents);
   }
 

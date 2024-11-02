@@ -1,18 +1,18 @@
 /// <reference path='d3-flextree.d.ts' />
 
-import { BaseType, select, Selection } from 'd3-selection';
+import { BaseType, select, Selection } from "d3-selection";
 import {
   ChartOptions,
   ExpanderDirection,
   ExpanderState,
   TreeNode,
   TreeNodeSelection,
-} from './api';
-import { flextree } from 'd3-flextree';
-import { HierarchyNode, HierarchyPointNode } from 'd3-hierarchy';
-import { max, min } from 'd3-array';
-import 'd3-transition';
-import { getVSize } from './composite-renderer';
+} from "./api";
+import { flextree } from "d3-flextree";
+import { HierarchyNode, HierarchyPointNode } from "d3-hierarchy";
+import { max, min } from "d3-array";
+import "d3-transition";
+import { getVSize } from "./composite-renderer";
 
 type SVGSelection = Selection<BaseType, {}, BaseType, {}>;
 
@@ -164,12 +164,12 @@ export class ChartUtil {
 
   updateSvgDimensions(chartInfo: ChartSizeInfo) {
     const svg = select(this.options.svgSelector);
-    const group = svg.select('g');
+    const group = svg.select("g");
     const transition = this.options.animate
       ? group.transition().delay(HIDE_TIME_MS).duration(MOVE_TIME_MS)
       : group;
     transition.attr(
-      'transform',
+      "transform",
       `translate(${chartInfo.origin[0]}, ${chartInfo.origin[1]})`
     );
   }
@@ -180,9 +180,9 @@ export class ChartUtil {
   ): Array<HierarchyPointNode<N>> {
     // Add styles so that calculating text size is correct.
     const svg = select(this.options.svgSelector);
-    if (svg.select('style').empty()) {
+    if (svg.select("style").empty()) {
       svg
-        .append('style')
+        .append("style")
         .text(this.options.renderer.getCss() + getExpanderCss());
     }
 
@@ -271,11 +271,11 @@ export class ChartUtil {
   ): Promise<void> {
     const animationPromise = new Promise<void>((resolve) => {
       const boundNodes = svg
-        .select('g')
-        .selectAll('g.node')
+        .select("g")
+        .selectAll("g.node")
         .data(nodes, (d: HierarchyPointNode<TreeNode>) => d.id!);
 
-      const nodeEnter = boundNodes.enter().append('g' as string);
+      const nodeEnter = boundNodes.enter().append("g" as string);
 
       let transitionsPending =
         boundNodes.exit().size() + boundNodes.size() + nodeEnter.size();
@@ -289,13 +289,17 @@ export class ChartUtil {
         resolve();
       }
 
-      // console.log("rendered_nodes::", nodes);
-      // node classes
       nodeEnter
         .merge(boundNodes)
-        .attr('class', (node) => `node generation${node.data.generation} ${(node.data as any).isInvisible ? 'invisible' : ''}`);
+        .attr(
+          "class",
+          (node) =>
+            `node generation${node.data.generation} ${
+              (node.data as any).isInvisible ? "invisible" : ""
+            }`
+        );
       nodeEnter.attr(
-        'transform',
+        "transform",
         (node: HierarchyPointNode<TreeNode>) =>
           `translate(${node.x - node.data.width! / 2}, ${
             node.y - node.data.height! / 2
@@ -303,22 +307,22 @@ export class ChartUtil {
       );
       if (this.options.animate) {
         nodeEnter
-          .style('opacity', 0)
+          .style("opacity", 0)
           .transition()
           .delay(HIDE_TIME_MS + MOVE_TIME_MS)
           .duration(HIDE_TIME_MS)
-          .style('opacity', 1)
-          .on('end', transitionDone);
+          .style("opacity", 1)
+          .on("end", transitionDone);
       }
       const updateTransition = this.options.animate
         ? boundNodes
             .transition()
             .delay(HIDE_TIME_MS)
             .duration(MOVE_TIME_MS)
-            .on('end', transitionDone)
+            .on("end", transitionDone)
         : boundNodes;
       updateTransition.attr(
-        'transform',
+        "transform",
         (node: HierarchyPointNode<TreeNode>) =>
           `translate(${node.x - node.data.width! / 2}, ${
             node.y - node.data.height! / 2
@@ -330,9 +334,9 @@ export class ChartUtil {
           .exit()
           .transition()
           .duration(HIDE_TIME_MS)
-          .style('opacity', 0)
+          .style("opacity", 0)
           .remove()
-          .on('end', transitionDone);
+          .on("end", transitionDone);
       } else {
         boundNodes.exit().remove();
       }
@@ -359,7 +363,6 @@ export class ChartUtil {
         return this.linkVertical(parent, child);
       };
 
-      // console.log("rendered_links::", nodes);
       const linkSpouse = (
         parent: HierarchyPointNode<TreeNode>,
         child: HierarchyPointNode<TreeNode>
@@ -372,50 +375,56 @@ export class ChartUtil {
           return this.linkVerticalSpouse(child, parent);
         }
         return this.linkVerticalSpouse(parent, child);
-      }
+      };
 
       const links = nodes.filter(
         (n) => !!n.parent || n.data.additionalMarriage
       );
-      
+
       svg
-        .select('g')
-        .selectAll('path.link')
+        .select("g")
+        .selectAll("path.link")
         .data(links, linkId)
         .enter()
-        .insert('path', 'g')
-        .attr('class', (node) => {
-          let classes = node.data.additionalMarriage ? 'link additional-marriage' : 'link';
-          // if ((node as any).data.isInvisible) {
-          //   classes += ' invisible';
-          // }
-          return classes;
-        })
-        .attr('d', (node) => {
+        .insert("path", "g")
+        .attr("class", (node) =>
+          node.data.additionalMarriage ? "link additional-marriage" : "link"
+        )
+        .attr("d", (node) => {
+          // don't draw link for node that is invisible
           if ((node.data as any).isInvisible) {
-            return '';
+            return "";
           }
+          // don't draw link to invisible parent of a node
           if ((node.parent!.data as any).isInvisible) {
-            return '';
+            return "";
           }
-          return link(node.parent!, node)
-        })
+          return link(node.parent!, node);
+        });
 
-      // const wypadekNode = nodes.find((n) => n.data.indi?.id === "I9")!;
-      // const ewa = nodes.find((n) => n.data.indi?.id === "I9")!;
-      // const janBasiaFamNode = nodes.find((n) => n.id === "F4")!;
+      // generate links between related memebers
+      const connectionsBetweenRelatedMembers = links
+        .filter((link: any) => link.data.relatedSpouse)
+        .map((link: any) => {
+          const relatedSpouseId = link.data.indi.id;
+          const spouseFamilyId = link.data.relatedSpouse.parentsFamilyId;
+          const spouseNode = nodes.find(
+            (n) => n.data.indi?.id === relatedSpouseId
+          );
+          const familyNode = nodes.find((n) => n.id === spouseFamilyId);
+          return [spouseNode, familyNode];
+        });
 
-      // svg
-      //   .select('g')
-      //   .selectAll('path.link')
-      //   .data([wypadekNode, ewa, janBasiaFamNode], linkId)
-      //   .enter()
-      //   .insert('path', 'g')
-      //   .attr('class', (node) =>
-      //     node.data.additionalMarriage ? 'link additional-marriage' : 'link'
-      //   )
-      //   .attr('d', () => linkSpouse(janBasiaFamNode, ewa));
+      svg
+        .select("g")
+        .selectAll("path.link")
+        .data(connectionsBetweenRelatedMembers, linkId)
+        .enter()
+        .insert("path", "g")
+        .attr("class", "link")
+        .attr("d", ([member, family]) => linkSpouse(family!, member!));
     });
+
     return animationPromise;
   }
 
@@ -428,36 +437,36 @@ export class ChartUtil {
   ) {
     nodes = nodes.filter((node) => stateGetter(node) !== undefined);
 
-    nodes.on('click', (event, data) => {
+    nodes.on("click", (event, data) => {
       clickCallback?.(data.id!);
     });
-    nodes.append('rect').attr('width', 12).attr('height', 12);
+    nodes.append("rect").attr("width", 12).attr("height", 12);
     nodes
-      .append('line')
-      .attr('x1', 3)
-      .attr('y1', 6)
-      .attr('x2', 9)
-      .attr('y2', 6)
-      .attr('stroke', 'black');
+      .append("line")
+      .attr("x1", 3)
+      .attr("y1", 6)
+      .attr("x2", 9)
+      .attr("y2", 6)
+      .attr("stroke", "black");
     nodes
       .filter((node) => stateGetter(node) === ExpanderState.PLUS)
-      .append('line')
-      .attr('x1', 6)
-      .attr('y1', 3)
-      .attr('x2', 6)
-      .attr('y2', 9)
-      .attr('stroke', 'black');
+      .append("line")
+      .attr("x1", 6)
+      .attr("y1", 3)
+      .attr("x2", 6)
+      .attr("y2", 9)
+      .attr("stroke", "black");
   }
 
   renderFamilyControls(nodes: TreeNodeSelection) {
     const boundNodes = nodes
-      .selectAll('g.familyExpander')
+      .selectAll("g.familyExpander")
       .data((node) => (node.data.family?.expander !== undefined ? [node] : []));
 
     const nodeEnter: TreeNodeSelection = boundNodes
       .enter()
-      .append('g')
-      .attr('class', 'familyExpander expander');
+      .append("g")
+      .attr("class", "familyExpander expander");
 
     const merged = nodeEnter.merge(boundNodes);
 
@@ -465,13 +474,12 @@ export class ChartUtil {
       ? merged.transition().delay(HIDE_TIME_MS).duration(MOVE_TIME_MS)
       : merged;
 
-    updateTransition.attr('transform', (node: HierarchyPointNode<TreeNode>) => {
+    updateTransition.attr("transform", (node: HierarchyPointNode<TreeNode>) => {
       const anchor = this.options.renderer.getFamilyAnchor(node.data);
       return `translate(${anchor[0] - 6}, ${
-        -node.data.height! / 2 +
-        getVSize(node.data, !!this.options.horizontal)
+        -node.data.height! / 2 + getVSize(node.data, !!this.options.horizontal)
       })`;
-  });
+    });
     this.renderExpander(
       merged,
       (node) => node.data.family?.expander,
@@ -482,13 +490,13 @@ export class ChartUtil {
 
   renderIndiControls(nodes: TreeNodeSelection) {
     const boundNodes = nodes
-      .selectAll('g.indiExpander')
+      .selectAll("g.indiExpander")
       .data((node) => (node.data.indi?.expander !== undefined ? [node] : []));
 
     const nodeEnter: TreeNodeSelection = boundNodes
       .enter()
-      .append('g')
-      .attr('class', 'indiExpander expander');
+      .append("g")
+      .attr("class", "indiExpander expander");
 
     const merged = nodeEnter.merge(boundNodes);
 
@@ -496,7 +504,7 @@ export class ChartUtil {
       ? merged.transition().delay(HIDE_TIME_MS).duration(MOVE_TIME_MS)
       : merged;
 
-    updateTransition.attr('transform', (node: HierarchyPointNode<TreeNode>) => {
+    updateTransition.attr("transform", (node: HierarchyPointNode<TreeNode>) => {
       const anchor = this.options.renderer.getIndiAnchor(node.data);
       return `translate(${anchor[0] - 6}, ${-node.data.height! / 2 - 12})`;
     });
@@ -510,13 +518,13 @@ export class ChartUtil {
 
   renderSpouseControls(nodes: TreeNodeSelection) {
     const boundNodes = nodes
-      .selectAll('g.spouseExpander')
+      .selectAll("g.spouseExpander")
       .data((node) => (node.data.spouse?.expander !== undefined ? [node] : []));
 
     const nodeEnter: TreeNodeSelection = boundNodes
       .enter()
-      .append('g')
-      .attr('class', 'spouseExpander expander');
+      .append("g")
+      .attr("class", "spouseExpander expander");
 
     const merged = nodeEnter.merge(boundNodes);
 
@@ -524,7 +532,7 @@ export class ChartUtil {
       ? merged.transition().delay(HIDE_TIME_MS).duration(MOVE_TIME_MS)
       : merged;
 
-    updateTransition.attr('transform', (node: HierarchyPointNode<TreeNode>) => {
+    updateTransition.attr("transform", (node: HierarchyPointNode<TreeNode>) => {
       const anchor = this.options.renderer.getSpouseAnchor(node.data);
       return `translate(${anchor[0] - 6}, ${-node.data.height! / 2 - 12})`;
     });
@@ -545,16 +553,16 @@ export class ChartUtil {
     }
     const animationPromise = new Promise<void>((resolve) => {
       const boundNodes = svg
-        .select('g')
-        .selectAll('g.controls')
+        .select("g")
+        .selectAll("g.controls")
         .data(nodes, (d: HierarchyPointNode<TreeNode>) => d.id!);
 
       const nodeEnter = boundNodes
         .enter()
-        .append('g' as string)
-        .attr('class', 'controls');
+        .append("g" as string)
+        .attr("class", "controls");
       nodeEnter.attr(
-        'transform',
+        "transform",
         (node: HierarchyPointNode<TreeNode>) =>
           `translate(${node.x}, ${node.y})`
       );
@@ -576,21 +584,21 @@ export class ChartUtil {
             .transition()
             .delay(HIDE_TIME_MS)
             .duration(MOVE_TIME_MS)
-            .on('end', transitionDone)
+            .on("end", transitionDone)
         : boundNodes;
       updateTransition.attr(
-        'transform',
+        "transform",
         (node: HierarchyPointNode<TreeNode>) =>
           `translate(${node.x}, ${node.y})`
       );
       if (this.options.animate) {
         nodeEnter
-          .style('opacity', 0)
+          .style("opacity", 0)
           .transition()
           .delay(HIDE_TIME_MS + MOVE_TIME_MS)
           .duration(HIDE_TIME_MS)
-          .style('opacity', 1)
-          .on('end', transitionDone);
+          .style("opacity", 1)
+          .on("end", transitionDone);
       }
 
       const merged = nodeEnter.merge(boundNodes);
@@ -603,9 +611,9 @@ export class ChartUtil {
           .exit()
           .transition()
           .duration(HIDE_TIME_MS)
-          .style('opacity', 0)
+          .style("opacity", 0)
           .remove()
-          .on('end', transitionDone);
+          .on("end", transitionDone);
       } else {
         boundNodes.exit().remove();
       }
@@ -616,8 +624,8 @@ export class ChartUtil {
 
   getSvgForRendering(): SVGSelection {
     const svg = select(this.options.svgSelector) as SVGSelection;
-    if (svg.select('g').empty()) {
-      svg.append('g');
+    if (svg.select("g").empty()) {
+      svg.append("g");
     }
     return svg;
   }
