@@ -421,7 +421,7 @@ export class ChartUtil {
         .data(connectionsBetweenRelatedMembers, linkId)
         .enter()
         .insert("path", "g")
-        .attr("class", "link")
+        .attr("class", "link-dotted")
         .attr("d", ([member, family]) => linkSpouse(family!, member!));
     });
 
