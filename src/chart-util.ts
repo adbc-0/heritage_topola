@@ -11,6 +11,7 @@ import {
 import { flextree } from "d3-flextree";
 import { HierarchyNode, HierarchyPointNode } from "d3-hierarchy";
 import { max, min } from "d3-array";
+import { zoom } from "d3-zoom";
 import "d3-transition";
 import { getVSize } from "./composite-renderer";
 
@@ -258,11 +259,27 @@ export class ChartUtil {
     const nodeAnimation = this.renderNodes(nodes, svg);
     const linkAnimation = this.renderLinks(nodes, svg);
     const expanderAnimation = this.renderControls(nodes, svg);
+    const zoomAnimation = this.addZoom(svg);
     return Promise.all([
+      zoomAnimation,
       nodeAnimation,
       linkAnimation,
       expanderAnimation,
     ]) as unknown as Promise<void>;
+  }
+
+  addZoom(svg: SVGSelection): Promise<void> {
+    const zoomPromise = new Promise<void>((resolve) => {
+      svg.attr("width", "600px");
+      svg.attr("height", "400px");
+      svg.attr("viewbox", "0 0 600 400");
+      const chartZoom = zoom().on("zoom", (e) => {
+        return select("svg g").attr("transform", e.transform);
+      });
+      // @ts-ignore
+      svg.call(chartZoom);
+    });
+    return zoomPromise;
   }
 
   renderNodes(
