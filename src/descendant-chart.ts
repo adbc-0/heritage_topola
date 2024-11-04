@@ -1,4 +1,4 @@
-import { HierarchyNode, HierarchyPointNode, stratify } from 'd3-hierarchy';
+import { HierarchyNode, HierarchyPointNode, stratify } from "d3-hierarchy";
 import {
   Chart,
   ChartInfo,
@@ -7,11 +7,11 @@ import {
   Fam,
   Indi,
   TreeNode,
-} from './api';
-import { ChartUtil, getChartInfo, LayoutOptions } from './chart-util';
-import { IdGenerator } from './id-generator';
+} from "./api";
+import { ChartUtil, getChartInfo, LayoutOptions } from "./chart-util";
+import { IdGenerator } from "./id-generator";
 
-export const DUMMY_ROOT_NODE_ID = 'DUMMY_ROOT_NODE';
+export const DUMMY_ROOT_NODE_ID = "DUMMY_ROOT_NODE";
 
 export function layOutDescendants(
   options: ChartOptions,
@@ -63,7 +63,8 @@ function getSpouse(indiId: string, fam: Fam): string | null {
 
 /** Renders a descendants chart. */
 export class DescendantChart<IndiT extends Indi, FamT extends Fam>
-  implements Chart {
+  implements Chart
+{
   readonly util: ChartUtil;
 
   constructor(readonly options: ChartOptions) {
@@ -114,7 +115,9 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
   }
 
   getIndiDetails(indiId: string) {
-    const indi = (this.options.data as any).json.indis.find((indi: any) => indi.id === indiId);
+    const indi = (this.options.data as any).json.indis.find(
+      (indi: any) => indi.id === indiId
+    );
     if (!indi) {
       throw new Error("No indi");
     }
@@ -139,7 +142,7 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
   createHierarchy(): HierarchyNode<TreeNode> {
     const parents: TreeNode[] = [];
     // if exists then don't render node and render connection instead
-    const relatedPair: Record<'main' | 'spouse', string>[] = [];
+    const relatedPair: Record<"main" | "spouse", string>[] = [];
 
     const nodes = this.options.startIndi
       ? this.getNodes(this.options.startIndi)
@@ -184,17 +187,18 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
         continue;
       }
       children.forEach((childId) => {
-        const childNodes = this
-          .getNodes(childId)
-          .filter((c) =>
-            !relatedPair.find(({ spouse }) => spouse === c.indi?.id)
-          );
+        const childNodes = this.getNodes(childId).filter(
+          (c) => !relatedPair.find(({ spouse }) => spouse === c.indi?.id)
+        );
         const relatedSpousePair = childNodes
-          .map((child) => ({ main: child.indi?.id!, spouse: child.spouse?.id! }))
+          .map((child) => ({
+            main: child.indi?.id!,
+            spouse: child.spouse?.id!,
+          }))
           .filter(({ spouse }) => spouse)
           .filter(({ spouse }) => this.areParents(spouse!));
         relatedSpousePair.forEach((pair) => {
-          relatedPair.push(pair)
+          relatedPair.push(pair);
         });
 
         // go through each child
@@ -214,7 +218,7 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
 
     // mark node as invisible
     parents.forEach((parent: any) => {
-      if (parent.id === 'DUMMY_ROOT_NODE') {
+      if (parent.id === "DUMMY_ROOT_NODE") {
         return;
       }
       const familyId = parent.family?.id;
@@ -223,14 +227,14 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
         const husbId = family?.json?.husb;
         if (husbId) {
           const indi = this.getIndiDetails(husbId);
-          if (indi.firstName === 'DUMMY' && indi.lastName === 'NODE') {
+          if (indi.firstName === "DUMMY" && indi.lastName === "NODE") {
             parent.isInvisible = true;
           }
         }
         const wifeId = family?.json?.wife;
         if (wifeId) {
           const indi = this.getIndiDetails(wifeId);
-          if (indi.firstName === 'DUMMY' && indi.lastName === 'NODE') {
+          if (indi.firstName === "DUMMY" && indi.lastName === "NODE") {
             parent.isInvisible = true;
           }
         }
@@ -238,7 +242,7 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
       }
       const indiId = parent.id;
       const indi = this.getIndiDetails(indiId);
-      if (indi.firstName === 'DUMMY' && indi.lastName === 'NODE') {
+      if (indi.firstName === "DUMMY" && indi.lastName === "NODE") {
         parent.isInvisible = true;
       }
     });
@@ -251,8 +255,13 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
         parent.relatedSpouse = undefined;
         return;
       }
-      const spouseParentsFamily = (this.options.data as any).indis.get(pair?.spouse).json.famc;
-      parent.relatedSpouse = { id: pair?.spouse, parentsFamilyId: spouseParentsFamily };
+      const spouseParentsFamily = (this.options.data as any).indis.get(
+        pair?.spouse
+      ).json.famc;
+      parent.relatedSpouse = {
+        id: pair?.spouse,
+        parentsFamilyId: spouseParentsFamily,
+      };
     });
 
     return stratify<TreeNode>()(parents);

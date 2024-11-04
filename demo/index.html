@@ -1,248 +1,201 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="topola.css" />
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="topola.css" />
-  <script src="https://d3js.org/d3.v4.min.js"></script>
-</head>
-
-<body>
-  <h1 id="relativesTitle">Relatives chart</h1>
-  <div>
-    <button onclick="download('relatives')">Download SVG</button>
-    <button onclick="print('relatives')">Print</button>
-  </div>
-  <svg class="graph" id="relatives"></svg>
-  <!-- Run `npm run build-demo` for `bundle.js` to be built. -->
-</body>
-<script src="bundle.js"></script>
-<script>
-  const tree =
-  {
-    "indis": [
-      {
-        "id": "I1",
-        "firstName": "DUMMY",
-        "lastName": "NODE",
-        "fams": [
-          "F1"
-        ]
-      },
-      {
-        "id": "I2",
-        "firstName": "DUMMY",
-        "lastName": "NODE",
-        "fams": [
-          "F2"
-        ],
-        "famc": "F1"
-      },
-      {
-        "id": "I3",
-        "firstName": "DUMMY",
-        "lastName": "NODE",
-        "fams": []
-      },
-      {
-        "id": "I4",
-        "firstName": "Mizera",
-        "lastName": "Weibl",
-        "fams": [
-          "F3"
-        ],
-        "famc": "F1"
-      },
-      {
-        "id": "I5",
-        "firstName": "Anna",
-        "lastName": "Weibl",
-        "nickName": "Czeszka Schildberg (Hohenstald)",
-        "fams": [
-          "F4"
-        ],
-        "famc": "F3"
-      },
-      {
-        "id": "I6",
-        "firstName": "Józef",
-        "lastName": "Pizło",
-        "fams": [
-          "F4"
-        ]
-      },
-      {
-        "id": "I7",
-        "firstName": "Helena",
-        "lastName": "Pizło",
-        "fams": [
-          "F5"
-        ],
-        "famc": "F4"
-      },
-      {
-        "id": "I8",
-        "firstName": "Aleksander",
-        "lastName": "Petraitis",
-        "fams": [
-          "F5"
-        ]
-      },
-      {
-        "id": "I9",
-        "firstName": "Aleksandra",
-        "lastName": "Petraitis",
-        "fams": [],
-        "famc": "F5"
-      },
-      {
-        "id": "I10",
-        "firstName": "Stefan",
-        "lastName": "Pizło",
-        "fams": [
-          "F6"
-        ],
-        "famc": "F4"
-      },
-      {
-        "id": "I11",
-        "firstName": "Cecylia",
-        "lastName": "Węgrzyn",
-        "fams": [
-          "F6"
-        ]
-      },
-      {
-        "id": "I12",
-        "firstName": "Maria",
-        "lastName": "Pizło",
-        "fams": [
-          "F7"
-        ],
-        "famc": "F4"
-      },
-      {
-        "id": "I13",
-        "firstName": "Jan",
-        "lastName": "Stanisławski",
-        "fams": [
-          "F7"
-        ]
-      },
-      {
-        "id": "I14",
-        "firstName": "Janina",
-        "lastName": "Pizło",
-        "fams": [
-          "F8"
-        ],
-        "famc": "F4"
-      },
-      {
-        "id": "I15",
-        "firstName": "Otton",
-        "lastName": "Ippoldt",
-        "fams": [
-          "F8"
-        ],
-        "famc": "F9"
-      },
-      {
-        "id": "I16",
-        "firstName": "Juliusz",
-        "lastName": "Ippoldt",
-        "fams": [
-          "F9"
-        ],
-        "famc": "F2"
-      },
-      {
-        "id": "I17",
-        "firstName": "Leopoldyna",
-        "lastName": "Kohout",
-        "fams": [
-          "F9"
-        ]
-      }
-    ],
-    "fams": [
-      {
-        "id": "F1",
-        "wife": "I1",
-        "children": [
-          "I4",
-          "I2"
-        ]
-      },
-      {
-        "id": "F2",
-        "husb": "I2",
-        "children": [
-          "I16"
-        ]
-      },
-      {
-        "id": "F3",
-        "wife": "I4",
-        "children": [
-          "I5"
-        ]
-      },
-      {
-        "id": "F4",
-        "husb": "I6",
-        "wife": "I5",
-        "children": [
-          "I7",
-          "I10",
-          "I12",
-          "I14"
-        ]
-      },
-      {
-        "id": "F5",
-        "husb": "I8",
-        "wife": "I7",
-        "children": [
-          "I9"
-        ]
-      },
-      {
-        "id": "F6",
-        "husb": "I10",
-        "wife": "I11",
-        "children": []
-      },
-      {
-        "id": "F7",
-        "husb": "I13",
-        "wife": "I12",
-        "children": []
-      },
-      {
-        "id": "F8",
-        "husb": "I15",
-        "wife": "I14",
-        "children": []
-      },
-      {
-        "id": "F9",
-        "husb": "I16",
-        "wife": "I17",
-        "children": [
-          "I15"
-        ]
-      }
-    ]
-  }
-  topola.createChart({
-    json: tree,
-    svgSelector: '#relatives',
-    chartType: topola.HourglassChart,
-    renderer: topola.SimpleRenderer,
-    colors: topola.ChartColors.COLOR_BY_SEX,
-  }).render();
-</script>
-
+  <body>
+    <h1 id="relativesTitle">Relatives chart</h1>
+    <div>
+      <button onclick="download('relatives')">Download SVG</button>
+      <button onclick="print('relatives')">Print</button>
+    </div>
+    <svg class="graph" id="relatives"></svg>
+    <!-- Run `npm run build-demo` for `bundle.js` to be built. -->
+  </body>
+  <script src="bundle.js"></script>
+  <script>
+    const tree = {
+      indis: [
+        {
+          id: "I1",
+          firstName: "DUMMY",
+          lastName: "NODE",
+          fams: ["F1"],
+        },
+        {
+          id: "I2",
+          firstName: "DUMMY",
+          lastName: "NODE",
+          fams: ["F2"],
+          famc: "F1",
+        },
+        {
+          id: "I3",
+          firstName: "DUMMY",
+          lastName: "NODE",
+          fams: [],
+        },
+        {
+          id: "I4",
+          firstName: "Mizera",
+          lastName: "Weibl",
+          fams: ["F3"],
+          famc: "F1",
+        },
+        {
+          id: "I5",
+          firstName: "Anna",
+          lastName: "Weibl",
+          nickName: "Czeszka Schildberg (Hohenstald)",
+          fams: ["F4"],
+          famc: "F3",
+        },
+        {
+          id: "I6",
+          firstName: "Józef",
+          lastName: "Pizło",
+          fams: ["F4"],
+        },
+        {
+          id: "I7",
+          firstName: "Helena",
+          lastName: "Pizło",
+          fams: ["F5"],
+          famc: "F4",
+        },
+        {
+          id: "I8",
+          firstName: "Aleksander",
+          lastName: "Petraitis",
+          fams: ["F5"],
+        },
+        {
+          id: "I9",
+          firstName: "Aleksandra",
+          lastName: "Petraitis",
+          fams: [],
+          famc: "F5",
+        },
+        {
+          id: "I10",
+          firstName: "Stefan",
+          lastName: "Pizło",
+          fams: ["F6"],
+          famc: "F4",
+        },
+        {
+          id: "I11",
+          firstName: "Cecylia",
+          lastName: "Węgrzyn",
+          fams: ["F6"],
+        },
+        {
+          id: "I12",
+          firstName: "Maria",
+          lastName: "Pizło",
+          fams: ["F7"],
+          famc: "F4",
+        },
+        {
+          id: "I13",
+          firstName: "Jan",
+          lastName: "Stanisławski",
+          fams: ["F7"],
+        },
+        {
+          id: "I14",
+          firstName: "Janina",
+          lastName: "Pizło",
+          fams: ["F8"],
+          famc: "F4",
+        },
+        {
+          id: "I15",
+          firstName: "Otton",
+          lastName: "Ippoldt",
+          fams: ["F8"],
+          famc: "F9",
+        },
+        {
+          id: "I16",
+          firstName: "Juliusz",
+          lastName: "Ippoldt",
+          fams: ["F9"],
+          famc: "F2",
+        },
+        {
+          id: "I17",
+          firstName: "Leopoldyna",
+          lastName: "Kohout",
+          fams: ["F9"],
+        },
+      ],
+      fams: [
+        {
+          id: "F1",
+          wife: "I1",
+          children: ["I4", "I2"],
+        },
+        {
+          id: "F2",
+          husb: "I2",
+          children: ["I16"],
+        },
+        {
+          id: "F3",
+          wife: "I4",
+          children: ["I5"],
+        },
+        {
+          id: "F4",
+          husb: "I6",
+          wife: "I5",
+          children: ["I7", "I10", "I12", "I14"],
+        },
+        {
+          id: "F5",
+          husb: "I8",
+          wife: "I7",
+          children: ["I9"],
+        },
+        {
+          id: "F6",
+          husb: "I10",
+          wife: "I11",
+          children: [],
+        },
+        {
+          id: "F7",
+          husb: "I13",
+          wife: "I12",
+          children: [],
+        },
+        {
+          id: "F8",
+          husb: "I15",
+          wife: "I14",
+          children: [],
+        },
+        {
+          id: "F9",
+          husb: "I16",
+          wife: "I17",
+          children: ["I15"],
+        },
+      ],
+    };
+    topola
+      .createChart({
+        json: tree,
+        svgSelector: "#relatives",
+        chartType: topola.HourglassChart,
+        renderer: topola.SimpleRenderer,
+        colors: topola.ChartColors.COLOR_BY_SEX,
+      })
+      .render();
+  </script>
 </html>

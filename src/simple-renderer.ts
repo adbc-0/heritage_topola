@@ -25,6 +25,18 @@ function getName(indi: IndiDetails) {
   return [indi.getFirstName() || "", indi.getLastName() || ""].join(" ");
 }
 
+function getFirstName(indi: IndiDetails) {
+  return indi.getFirstName() ?? "";
+}
+
+function getLastName(indi: IndiDetails) {
+  return indi.getLastName() ?? "";
+}
+
+function createPersonHyperLink(indi: IndiDetails) {
+  return "http://localhost:3000/person/" + indi.getId();
+}
+
 function getYears(indi: IndiDetails) {
   const birthDate = indi.getBirthDate();
   const birthYear = birthDate && birthDate.date && birthDate.date.year;
@@ -50,12 +62,12 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
   getPreferredIndiSize(id: string): [number, number] {
     const indi = this.options.data.getIndi(id)!;
     const years = getYears(indi);
-    const width = Math.max(
-      getLength(getName(indi)) + 8,
-      getLength(years),
-      MIN_WIDTH
+    const nameLength = Math.max(
+      getLength(getFirstName(indi)),
+      getLength(getLastName(indi))
     );
-    const height = years ? MIN_HEIGHT + 14 : MIN_HEIGHT;
+    const width = Math.max(nameLength + 8, getLength(years), MIN_WIDTH);
+    const height = MIN_HEIGHT + 14;
     return [width, height];
   }
 
@@ -127,7 +139,15 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
     group
       .append("rect")
       .attr("width", (node) => indiFunc(node.data).width!)
-      .attr("height", (node) => indiFunc(node.data).height!);
+      .attr("height", (node) => indiFunc(node.data).height!)
+      .on("click", (_, node) => {
+        console.log(
+          "reroute to different page:",
+          createPersonHyperLink(
+            this.options.data.getIndi(indiFunc(node.data).id)!
+          )
+        );
+      });
 
     // Text.
     group
@@ -139,8 +159,37 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
         (node) => `translate(${indiFunc(node.data).width! / 2}, 17)`
       )
       .text((node) =>
-        getName(this.options.data.getIndi(indiFunc(node.data).id)!)
-      );
+        getFirstName(this.options.data.getIndi(indiFunc(node.data).id)!)
+      )
+      .on("click", (_, node) => {
+        console.log(
+          "reroute to different page:",
+          createPersonHyperLink(
+            this.options.data.getIndi(indiFunc(node.data).id)!
+          )
+        );
+      });
+
+    group
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("class", "name")
+      .attr(
+        "transform",
+        (node) => `translate(${indiFunc(node.data).width! / 2}, 33)`
+      )
+      .text((node) =>
+        getLastName(this.options.data.getIndi(indiFunc(node.data).id)!)
+      )
+      .on("click", (_, node) => {
+        console.log(
+          "reroute to different page:",
+          createPersonHyperLink(
+            this.options.data.getIndi(indiFunc(node.data).id)!
+          )
+        );
+      });
+
     group
       .append("text")
       .attr("text-anchor", "middle")

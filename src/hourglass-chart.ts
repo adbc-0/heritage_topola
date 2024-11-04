@@ -1,4 +1,4 @@
-import { getAncestorsTree } from './ancestor-chart';
+import { getAncestorsTree } from "./ancestor-chart";
 import {
   Chart,
   ChartInfo,
@@ -6,9 +6,9 @@ import {
   ExpanderDirection,
   Fam,
   Indi,
-} from './api';
-import { ChartUtil, getChartInfo } from './chart-util';
-import { layOutDescendants } from './descendant-chart';
+} from "./api";
+import { ChartUtil, getChartInfo } from "./chart-util";
+import { layOutDescendants } from "./descendant-chart";
 
 /**
  * Renders an hourglass chart. It consists of an ancestor chart and
@@ -28,7 +28,6 @@ export class HourglassChart<IndiT extends Indi, FamT extends Fam>
     const ancestorNodes = this.util.layOutChart(ancestorsRoot, {
       flipVertically: true,
     });
-
     const descendantNodes = layOutDescendants(this.options);
 
     // The first ancestor node and descendant node is the start node.
@@ -43,7 +42,6 @@ export class HourglassChart<IndiT extends Indi, FamT extends Fam>
 
     // slice(1) removes the duplicated start node.
     const nodes = ancestorNodes.slice(1).concat(descendantNodes);
-    // console.log("render_my_chart");
     const animationPromise = this.util.renderChart(nodes);
 
     const info = getChartInfo(nodes);

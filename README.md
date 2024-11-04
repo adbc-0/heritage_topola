@@ -1,8 +1,5 @@
 # Topola – online genealogy visualization
 
-1. Person must be clickable
-2. Surname under name
-
 ```
 npm pack
 ```
