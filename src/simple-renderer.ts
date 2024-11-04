@@ -96,7 +96,7 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
 
 .link-dotted {
     fill: none;
-    stroke: #F00;
+    stroke: #000;
     stroke-width: 1px;
     stroke-dasharray: 4;
 }
