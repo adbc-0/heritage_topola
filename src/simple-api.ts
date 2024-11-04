@@ -132,7 +132,7 @@ class SimpleChartHandle implements ChartHandle {
 
     const chart = new this.options.chartType(this.chartOptions);
     const info = chart.render();
-
+    // old width and height setter
     // if (this.options.updateSvgSize !== false) {
     //   select(this.chartOptions.svgSelector)
     //     .attr("width", info.size[0])
