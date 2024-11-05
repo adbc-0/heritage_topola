@@ -163,6 +163,7 @@ export class ChartUtil {
             L ${dx}, ${dy}`;
   }
 
+  // starting position
   updateSvgDimensions(chartInfo: ChartSizeInfo) {
     const svg = select(this.options.svgSelector);
     const group = svg.select("g");
@@ -258,28 +259,12 @@ export class ChartUtil {
     const svg = this.getSvgForRendering();
     const nodeAnimation = this.renderNodes(nodes, svg);
     const linkAnimation = this.renderLinks(nodes, svg);
-    const expanderAnimation = this.renderControls(nodes, svg);
-    const zoomAnimation = this.addZoom(svg);
+    // const expanderAnimation = this.renderControls(nodes, svg);
     return Promise.all([
-      zoomAnimation,
       nodeAnimation,
       linkAnimation,
-      expanderAnimation,
+      // expanderAnimation,
     ]) as unknown as Promise<void>;
-  }
-
-  addZoom(svg: SVGSelection): Promise<void> {
-    const zoomPromise = new Promise<void>((resolve) => {
-      svg.attr("width", "600px");
-      svg.attr("height", "400px");
-      svg.attr("viewbox", "0 0 600 400");
-      const chartZoom = zoom().on("zoom", (e) => {
-        return select("svg g").attr("transform", e.transform);
-      });
-      // @ts-ignore
-      svg.call(chartZoom);
-    });
-    return zoomPromise;
   }
 
   renderNodes(
@@ -338,13 +323,13 @@ export class ChartUtil {
             .duration(MOVE_TIME_MS)
             .on("end", transitionDone)
         : boundNodes;
-      updateTransition.attr(
-        "transform",
-        (node: HierarchyPointNode<TreeNode>) =>
-          `translate(${node.x - node.data.width! / 2}, ${
-            node.y - node.data.height! / 2
-          })`
-      );
+      // updateTransition.attr(
+      //   "transform",
+      //   (node: HierarchyPointNode<TreeNode>) =>
+      //     `translate(${node.x - node.data.width! / 2}, ${
+      //       node.y - node.data.height! / 2
+      //     })`
+      // );
       this.options.renderer.render(nodeEnter, boundNodes);
       if (this.options.animate) {
         boundNodes
@@ -491,12 +476,12 @@ export class ChartUtil {
       ? merged.transition().delay(HIDE_TIME_MS).duration(MOVE_TIME_MS)
       : merged;
 
-    updateTransition.attr("transform", (node: HierarchyPointNode<TreeNode>) => {
-      const anchor = this.options.renderer.getFamilyAnchor(node.data);
-      return `translate(${anchor[0] - 6}, ${
-        -node.data.height! / 2 + getVSize(node.data, !!this.options.horizontal)
-      })`;
-    });
+    // updateTransition.attr("transform", (node: HierarchyPointNode<TreeNode>) => {
+    //   const anchor = this.options.renderer.getFamilyAnchor(node.data);
+    //   return `translate(${anchor[0] - 6}, ${
+    //     -node.data.height! / 2 + getVSize(node.data, !!this.options.horizontal)
+    //   })`;
+    // });
     this.renderExpander(
       merged,
       (node) => node.data.family?.expander,
@@ -521,10 +506,10 @@ export class ChartUtil {
       ? merged.transition().delay(HIDE_TIME_MS).duration(MOVE_TIME_MS)
       : merged;
 
-    updateTransition.attr("transform", (node: HierarchyPointNode<TreeNode>) => {
-      const anchor = this.options.renderer.getIndiAnchor(node.data);
-      return `translate(${anchor[0] - 6}, ${-node.data.height! / 2 - 12})`;
-    });
+    // updateTransition.attr("transform", (node: HierarchyPointNode<TreeNode>) => {
+    //   const anchor = this.options.renderer.getIndiAnchor(node.data);
+    //   return `translate(${anchor[0] - 6}, ${-node.data.height! / 2 - 12})`;
+    // });
     this.renderExpander(
       merged,
       (node) => node.data.indi?.expander,
@@ -549,10 +534,10 @@ export class ChartUtil {
       ? merged.transition().delay(HIDE_TIME_MS).duration(MOVE_TIME_MS)
       : merged;
 
-    updateTransition.attr("transform", (node: HierarchyPointNode<TreeNode>) => {
-      const anchor = this.options.renderer.getSpouseAnchor(node.data);
-      return `translate(${anchor[0] - 6}, ${-node.data.height! / 2 - 12})`;
-    });
+    // updateTransition.attr("transform", (node: HierarchyPointNode<TreeNode>) => {
+    //   const anchor = this.options.renderer.getSpouseAnchor(node.data);
+    //   return `translate(${anchor[0] - 6}, ${-node.data.height! / 2 - 12})`;
+    // });
     this.renderExpander(
       merged,
       (node) => node.data.spouse?.expander,
@@ -578,11 +563,11 @@ export class ChartUtil {
         .enter()
         .append("g" as string)
         .attr("class", "controls");
-      nodeEnter.attr(
-        "transform",
-        (node: HierarchyPointNode<TreeNode>) =>
-          `translate(${node.x}, ${node.y})`
-      );
+      // nodeEnter.attr(
+      //   "transform",
+      //   (node: HierarchyPointNode<TreeNode>) =>
+      //     `translate(${node.x}, ${node.y})`
+      // );
 
       let transitionsPending =
         boundNodes.exit().size() + boundNodes.size() + nodeEnter.size();
@@ -603,11 +588,11 @@ export class ChartUtil {
             .duration(MOVE_TIME_MS)
             .on("end", transitionDone)
         : boundNodes;
-      updateTransition.attr(
-        "transform",
-        (node: HierarchyPointNode<TreeNode>) =>
-          `translate(${node.x}, ${node.y})`
-      );
+      // updateTransition.attr(
+      //   "transform",
+      //   (node: HierarchyPointNode<TreeNode>) =>
+      //     `translate(${node.x}, ${node.y})`
+      // );
       if (this.options.animate) {
         nodeEnter
           .style("opacity", 0)

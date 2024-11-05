@@ -1,4 +1,6 @@
 import { getAncestorsTree } from "./ancestor-chart";
+import { select } from "d3-selection";
+import { zoom, zoomIdentity } from "d3-zoom";
 import {
   Chart,
   ChartInfo,
@@ -45,7 +47,20 @@ export class HourglassChart<IndiT extends Indi, FamT extends Fam>
     const animationPromise = this.util.renderChart(nodes);
 
     const info = getChartInfo(nodes);
-    this.util.updateSvgDimensions(info);
+
+    function zoomed(e: any) {
+      return select("g").attr("transform", e.transform);
+    }
+    function move() {
+      return zoomIdentity.translate(info.origin[0], info.origin[1]);
+    }
+    const svg = select("svg").attr("width", "100%").attr("height", "400px");
+    const chartZoom = zoom().scaleExtent([0.25, 8]).on("zoom", zoomed);
+    // @ts-ignore
+    svg.call(chartZoom);
+    // @ts-ignore
+    svg.call(chartZoom.transform, move);
+
     return Object.assign(info, { animationPromise });
   }
 }
