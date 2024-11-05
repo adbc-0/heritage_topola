@@ -54,7 +54,7 @@ export class HourglassChart<IndiT extends Indi, FamT extends Fam>
     function move() {
       return zoomIdentity.translate(info.origin[0], info.origin[1]);
     }
-    const svg = select("svg").attr("width", "100%").attr("height", "400px");
+    const svg = select("svg").attr("width", "100%").attr("height", "100%");
     const chartZoom = zoom().scaleExtent([0.25, 8]).on("zoom", zoomed);
     // @ts-ignore
     svg.call(chartZoom);
