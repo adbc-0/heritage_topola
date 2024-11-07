@@ -97,7 +97,6 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
 
 .simple rect {
   fill: #fff;
-  stroke: black;
 }
 
 .link {
@@ -140,6 +139,12 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
       .append("rect")
       .attr("width", (node) => indiFunc(node.data).width!)
       .attr("height", (node) => indiFunc(node.data).height!)
+      .attr(
+        "stroke",
+        (node) =>
+          (this.options.data.getIndi(indiFunc(node.data).id) as any).json
+            .color ?? "#000"
+      )
       .on("click", (_, node) => {
         console.log(
           "reroute to different page:",

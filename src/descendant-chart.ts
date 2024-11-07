@@ -263,7 +263,6 @@ export class DescendantChart<IndiT extends Indi, FamT extends Fam>
         parentsFamilyId: spouseParentsFamily,
       };
     });
-
     return stratify<TreeNode>()(parents);
   }
 
