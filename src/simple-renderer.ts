@@ -96,7 +96,7 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
 }
 
 .simple rect {
-  fill: #fff;
+  stroke: #000;
 }
 
 .link {
@@ -140,10 +140,10 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
       .attr("width", (node) => indiFunc(node.data).width!)
       .attr("height", (node) => indiFunc(node.data).height!)
       .attr(
-        "stroke",
+        "fill",
         (node) =>
           (this.options.data.getIndi(indiFunc(node.data).id) as any).json
-            .color ?? "#000"
+            .color ?? "#FFF"
       )
       .on("click", (_, node) => {
         console.log(
