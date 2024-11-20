@@ -33,10 +33,6 @@ function getLastName(indi: IndiDetails) {
   return indi.getLastName() ?? "";
 }
 
-function createPersonHyperLink(indi: IndiDetails) {
-  return "http://localhost:3000/person/" + indi.getId();
-}
-
 function getYears(indi: IndiDetails) {
   const birthDate = indi.getBirthDate();
   const birthYear = birthDate && birthDate.date && birthDate.date.year;
@@ -134,6 +130,15 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
           )
       : selection;
 
+    if (this.options.indiCallback) {
+      group.on("click", (event, data) => {
+        return this.options.indiCallback!({
+          id: data.data.indi?.id!,
+          generation: data.data.generation!,
+        });
+      });
+    }
+
     // Box.
     group
       .append("rect")
@@ -144,15 +149,7 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
         (node) =>
           (this.options.data.getIndi(indiFunc(node.data).id) as any).json
             .color ?? "#FFF"
-      )
-      .on("click", (_, node) => {
-        console.log(
-          "reroute to different page:",
-          createPersonHyperLink(
-            this.options.data.getIndi(indiFunc(node.data).id)!
-          )
-        );
-      });
+      );
 
     // Text.
     group
@@ -165,15 +162,7 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
       )
       .text((node) =>
         getFirstName(this.options.data.getIndi(indiFunc(node.data).id)!)
-      )
-      .on("click", (_, node) => {
-        console.log(
-          "reroute to different page:",
-          createPersonHyperLink(
-            this.options.data.getIndi(indiFunc(node.data).id)!
-          )
-        );
-      });
+      );
 
     group
       .append("text")
@@ -185,15 +174,7 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
       )
       .text((node) =>
         getLastName(this.options.data.getIndi(indiFunc(node.data).id)!)
-      )
-      .on("click", (_, node) => {
-        console.log(
-          "reroute to different page:",
-          createPersonHyperLink(
-            this.options.data.getIndi(indiFunc(node.data).id)!
-          )
-        );
-      });
+      );
 
     group
       .append("text")
