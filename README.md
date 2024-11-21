@@ -1,6 +1,7 @@
 # Topola – online genealogy visualization
 
 ```
+npm build
 npm pack
 ```
 

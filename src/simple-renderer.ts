@@ -9,7 +9,7 @@ import {
 import { FamDetails, IndiDetails } from "./data";
 import { CompositeRenderer } from "./composite-renderer";
 
-const MIN_HEIGHT = 27;
+const MIN_HEIGHT = 40;
 const MIN_WIDTH = 50;
 
 /** Calculates the length of the given text in pixels when rendered. */
@@ -60,10 +60,11 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
     const years = getYears(indi);
     const nameLength = Math.max(
       getLength(getFirstName(indi)),
-      getLength(getLastName(indi))
+      getLength(getLastName(indi)),
+      getLength(years)
     );
     const width = Math.max(nameLength + 8, getLength(years), MIN_WIDTH);
-    const height = MIN_HEIGHT + 14;
+    const height = years ? MIN_HEIGHT + 14 : MIN_HEIGHT;
     return [width, height];
   }
 
@@ -124,10 +125,10 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
     // Optionally add a link.
     const group = this.options.indiHrefFunc
       ? selection
-          .append("a")
-          .attr("href", (node) =>
-            this.options.indiHrefFunc!(indiFunc(node.data).id)
-          )
+        .append("a")
+        .attr("href", (node) =>
+          this.options.indiHrefFunc!(indiFunc(node.data).id)
+        )
       : selection;
 
     if (this.options.indiCallback) {
@@ -182,7 +183,7 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
       .attr("class", "details")
       .attr(
         "transform",
-        (node) => `translate(${indiFunc(node.data).width! / 2}, 33)`
+        (node) => `translate(${indiFunc(node.data).width! / 2}, 49)`
       )
       .text((node) =>
         getYears(this.options.data.getIndi(indiFunc(node.data).id)!)
