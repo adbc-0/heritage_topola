@@ -80,6 +80,7 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
           : `translate(${node.data.indi!.width}, 0)`
       );
     this.renderIndi(spouseSelection, (node) => node.spouse!);
+    this.makeIndiClickable(selection);
   }
 
   getCss() {
@@ -118,6 +119,25 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
 }`;
   }
 
+  private makeIndiClickable(selection: TreeNodeSelection) {
+    if (!this.options.indiCallback) {
+      return;
+    }
+    selection.on("click", (event, data) => {
+      const leftNode = event.target.parentElement.classList.contains('simple');
+      if (leftNode) {
+        return this.options.indiCallback!({
+          id: data.data.indi?.id!,
+          generation: data.data.generation!,
+        });
+      }
+      return this.options.indiCallback!({
+        id: data.data.spouse?.id!,
+        generation: data.data.generation!,
+      });
+    })
+  }
+
   private renderIndi(
     selection: TreeNodeSelection,
     indiFunc: (node: TreeNode) => TreeEntry
@@ -130,15 +150,6 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
           this.options.indiHrefFunc!(indiFunc(node.data).id)
         )
       : selection;
-
-    if (this.options.indiCallback) {
-      group.on("click", (event, data) => {
-        return this.options.indiCallback!({
-          id: data.data.indi?.id!,
-          generation: data.data.generation!,
-        });
-      });
-    }
 
     // Box.
     group
