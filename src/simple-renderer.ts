@@ -85,6 +85,10 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
 
   getCss() {
     return `
+.graph {
+    cursor: move;
+}
+
 .simple text {
   font: 12px sans-serif;
 }
@@ -110,8 +114,13 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
     stroke-dasharray: 4;
 }
 
+.node {
+  cursor: pointer;
+}
+
 .invisible {
   opacity: 0;
+  cursor: inherit;
 }
 
 .additional-marriage {
@@ -124,7 +133,7 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
       return;
     }
     selection.on("click", (event, data) => {
-      const leftNode = event.target.parentElement.classList.contains('simple');
+      const leftNode = event.target.parentElement.classList.contains("simple");
       if (leftNode) {
         return this.options.indiCallback!({
           id: data.data.indi?.id!,
@@ -135,7 +144,7 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
         id: data.data.spouse?.id!,
         generation: data.data.generation!,
       });
-    })
+    });
   }
 
   private renderIndi(
@@ -145,10 +154,10 @@ export class SimpleRenderer extends CompositeRenderer implements Renderer {
     // Optionally add a link.
     const group = this.options.indiHrefFunc
       ? selection
-        .append("a")
-        .attr("href", (node) =>
-          this.options.indiHrefFunc!(indiFunc(node.data).id)
-        )
+          .append("a")
+          .attr("href", (node) =>
+            this.options.indiHrefFunc!(indiFunc(node.data).id)
+          )
       : selection;
 
     // Box.

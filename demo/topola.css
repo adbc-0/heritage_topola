@@ -14,9 +14,9 @@ body {
   background: #ccc;
 }
 
-.node {
+/* .node {
   cursor: pointer;
-}
+} */
 
 #fileUploadLink {
   color: blue;
