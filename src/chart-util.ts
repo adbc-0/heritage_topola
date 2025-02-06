@@ -78,7 +78,12 @@ export function getChartInfo(
   const y0 = min(nodes, (d) => d.y - d.data.height! / 2)! - MARGIN;
   const x1 = max(nodes, (d) => d.x + d.data.width! / 2)! + MARGIN;
   const y1 = max(nodes, (d) => d.y + d.data.height! / 2)! + MARGIN;
-  return { size: [x1 - x0, y1 - y0], origin: [-x0, -y0] };
+
+  const totalWidth = document.querySelector("svg")!.clientWidth;
+  return {
+    size: [x1 - x0, y1 - y0],
+    origin: [totalWidth / 2, -y0],
+  };
 }
 
 export function getChartInfoWithoutMargin(

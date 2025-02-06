@@ -46,21 +46,22 @@ export class HourglassChart<IndiT extends Indi, FamT extends Fam>
     const nodes = ancestorNodes.slice(1).concat(descendantNodes);
     const animationPromise = this.util.renderChart(nodes);
 
+    const svg = select(this.options.svgSelector)
+      .attr("width", "100%")
+      .attr("height", "100%");
+
     const info = getChartInfo(nodes);
 
     function zoomed(e: any) {
       return select("g").attr("transform", e.transform);
     }
-    function move() {
+    function setInitialPosiiton() {
       return zoomIdentity.translate(info.origin[0], info.origin[1]);
     }
-    const svg = select(this.options.svgSelector)
-      .attr("width", "100%")
-      .attr("height", "100%");
     const chartZoom = zoom().scaleExtent([0.05, 8]).on("zoom", zoomed);
     svg.call(chartZoom);
     // @ts-ignore
-    svg.call(chartZoom.transform, move);
+    svg.call(chartZoom.transform, setInitialPosiiton);
 
     return Object.assign(info, { animationPromise });
   }
