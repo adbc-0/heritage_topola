@@ -46,10 +46,7 @@ export class HourglassChart<IndiT extends Indi, FamT extends Fam>
     const nodes = ancestorNodes.slice(1).concat(descendantNodes);
     const animationPromise = this.util.renderChart(nodes);
 
-    const svg = select(this.options.svgSelector)
-      .attr("width", "100%")
-      .attr("height", "100%");
-
+    const svg = select(this.options.svgSelector);
     const info = getChartInfo(nodes);
 
     function zoomed(e: any) {
